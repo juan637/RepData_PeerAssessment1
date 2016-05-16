@@ -4,22 +4,72 @@ output:
   html_document:
     keep_md: true
 ---
-
-
 ## Loading and preprocessing the data
-
-
-
+```{r first,echo=TRUE}
+getwd()
+setwd("C:/Users/User/Documents/Reproducible research/First Homework")
+active<-read.table("C:/Users/User/Documents/Reproducible research/First Homework/activity.csv",sep=",",header=TRUE)
+```
 ## What is mean total number of steps taken per day?
-
-
+```{r,echo=TRUE}
+str(active)
+library(ggplot2)
+date=as.character(active$date)
+summary(active)
+aa<-(tapply(active$steps,date,sum))
+##Removing na
+ab<- aa[!is.na(aa)]
+View(ab)
+plot(ab)
+table=as.table(ab)
+plot(table)
+```
 
 ## What is the average daily activity pattern?
-
-
-
+```{r,echo=TRUE}
+##mean
+View(tapply(active$steps,active$date,mean))
+##median
+View(tapply(active$steps,active$date,median))
+```
 ## Imputing missing values
-
-
+```{r,echo=TRUE}
+##I am going to impute the na with some random number from the same column
+randomly <- function (z){
+        quantifying.na <- is.na(z)
+        n.missing <- sum(quantifying.na)
+        a.obs <- z[!quantifying.na]
+        imputed <- z
+        imputed[quantifying.na] <- sample (a.obs, n.missing, replace=TRUE)
+        return (imputed)
+}
+##Formula for each variable-in this case an invented variable called active
+any.variable<- randomly (active)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r,echo=TRUE}
+##Taken out the na´s and replacing it by random numbers
+steps.random.na2<- randomly (active$steps)
+ap<-(tapply(steps.random.na2,date,mean))
+plot(ap)
+table2=as.table(ap)
+plot(table2)
+aq<-as.data.frame(table2)
+colnames(aq)<-c("date3","steps3")
+##steps day after day, with the substitution of the na´s values
+plot(aq)
+
+##Coverting to days of the week
+aq$date3<-as.POSIXlt(aq$date3)
+day3<-weekdays(aq$date3)
+
+ar<-(tapply(aq$steps3,day3,mean))
+table3<-as.table(ar)
+as<-as.data.frame(table3)        
+colnames(as)<-c("days4","steps4")
+##Distribution in the different days of the week
+plot(as)
+```
+
+
